@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"github.com/gorilla/handlers"
 	"log"
 	"net/http"
+	"os"
 )
 
 func addACAOHeader(value string, h http.Handler) http.Handler {
@@ -12,13 +14,6 @@ func addACAOHeader(value string, h http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", value)
-		h.ServeHTTP(w, r)
-	})
-}
-
-func logRequest(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Print(r.URL.Path)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -33,7 +28,11 @@ func main() {
 	)
 	flag.Parse()
 
-	http.Handle(*prefix, logRequest(addACAOHeader(*acao, http.StripPrefix(*prefix, http.FileServer(http.Dir(*root))))))
+	http.Handle(*prefix,
+		handlers.LoggingHandler(os.Stdout,
+			addACAOHeader(*acao,
+				http.StripPrefix(*prefix,
+					http.FileServer(http.Dir(*root))))))
 
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal(err)
