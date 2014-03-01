@@ -21,7 +21,7 @@ func addACAOHeader(value string, h http.Handler) http.Handler {
 func main() {
 
 	var (
-		acao   = flag.String("acao", "*", "Access-Control-ALlow-Origin")
+		acao   = flag.String("acao", "*", "Access-Control-Allow-Origin")
 		addr   = flag.String("addr", "127.0.0.1:8080", "addr")
 		root   = flag.String("root", ".", "root")
 		prefix = flag.String("prefix", "/", "prefix")
