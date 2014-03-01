@@ -16,6 +16,13 @@ func addACAOHeader(value string, h http.Handler) http.Handler {
 	})
 }
 
+func logRequest(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Print(r.URL.Path)
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 
 	var (
@@ -26,7 +33,7 @@ func main() {
 	)
 	flag.Parse()
 
-	http.Handle(*prefix, addACAOHeader(*acao, http.StripPrefix(*prefix, http.FileServer(http.Dir(*root)))))
+	http.Handle(*prefix, logRequest(addACAOHeader(*acao, http.StripPrefix(*prefix, http.FileServer(http.Dir(*root))))))
 
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal(err)
