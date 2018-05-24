@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
-	"github.com/gorilla/handlers"
-	"github.com/twpayne/gombtiles/mbtiles"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/gorilla/handlers"
+	"github.com/twpayne/gombtiles/mbtiles"
 )
 
 func addACAOHeader(value string, h http.Handler) http.Handler {
