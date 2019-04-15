@@ -10,9 +10,6 @@ import (
 )
 
 func addACAOHeader(value string, h http.Handler) http.Handler {
-	if value == "" {
-		return h
-	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", value)
 		h.ServeHTTP(w, r)
@@ -28,11 +25,13 @@ func main() {
 	)
 	flag.Parse()
 
-	http.Handle(*prefix,
-		handlers.LoggingHandler(os.Stdout,
-			addACAOHeader(*acao,
-				http.StripPrefix(*prefix,
-					http.FileServer(http.Dir(*root))))))
+	h := http.StripPrefix(*prefix, http.FileServer(http.Dir(*root)))
+	if *acao != "" {
+		h = addACAOHeader(*acao, h)
+	}
+	h = handlers.LoggingHandler(os.Stdout, h)
+
+	http.Handle(*prefix, h)
 
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		fmt.Println(err)
