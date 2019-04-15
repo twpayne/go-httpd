@@ -20,7 +20,6 @@ func addACAOHeader(value string, h http.Handler) http.Handler {
 }
 
 func main() {
-
 	var (
 		acao   = flag.String("acao", "*", "Access-Control-Allow-Origin")
 		addr   = flag.String("addr", ":8080", "addr")
@@ -38,5 +37,4 @@ func main() {
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal(err)
 	}
-
 }
