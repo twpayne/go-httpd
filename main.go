@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/gorilla/handlers"
 )
@@ -18,10 +17,6 @@ func addACAOHeader(value string, h http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", value)
 		h.ServeHTTP(w, r)
 	})
-}
-
-func stripExt(path string) string {
-	return path[:len(path)-len(filepath.Ext(path))]
 }
 
 func main() {
