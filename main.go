@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -35,6 +35,7 @@ func main() {
 					http.FileServer(http.Dir(*root))))))
 
 	if err := http.ListenAndServe(*addr, nil); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
