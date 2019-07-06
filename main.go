@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/subtle"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -60,11 +61,11 @@ func extendStringBytes(s string, n int) []byte {
 	return []byte(s + strings.Repeat("\x00", m))
 }
 
-func main() {
+func run() error {
 	var (
 		acao     = flag.String("acao", "*", "Access-Control-Allow-Origin")
 		addr     = flag.String("addr", ":8080", "addr")
-		realm    = flag.String("realm", "go-httpd", "realm")
+		realm    = flag.String("realm", "", "realm")
 		root     = flag.String("root", ".", "root")
 		password = flag.String("password", "", "password")
 		prefix   = flag.String("prefix", "/", "prefix")
@@ -76,14 +77,23 @@ func main() {
 	if *acao != "" {
 		h = addACAOHeader(*acao, h)
 	}
-	if *realm != "" || *username != "" || *password != "" {
+	switch {
+	case *realm == "" && *username == "" && *password == "":
+		// do nothing
+	case *realm != "" && *username != "" && *password != "":
 		h = basicAuth(*realm, *username, *password, 1024, h)
+	default:
+		return errors.New("exactly all or none of realm, username, and password must be set")
 	}
 	h = handlers.LoggingHandler(os.Stdout, h)
 
 	http.Handle(*prefix, h)
 
-	if err := http.ListenAndServe(*addr, nil); err != nil {
+	return http.ListenAndServe(*addr, nil)
+}
+
+func main() {
+	if err := run(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
